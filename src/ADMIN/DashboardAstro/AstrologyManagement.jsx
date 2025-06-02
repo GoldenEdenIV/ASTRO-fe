@@ -1,136 +1,203 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TabNavigation from "./TabNavigation";
-import ZodiacSection from "./ZodiacSection";
-import PlanetSection from "./PlanetSection";
-import HouseSection from "./HouseSection";
-import AspectSection from "./AspectSection";
-import AddModal from "./AddModal";
+import SystemsSection from "./SystemsSection";
+import MeaningsSection from "./MeaningsSection";
+import AddSystemModal from "./AddSystemModal";
+import EditSystemModal from "./EditSystemModal";
 
 function AstrologyManagement() {
-  const [activeSection, setActiveSection] = useState("zodiac");
+  const [activeSection, setActiveSection] = useState("systems");
   const [editMode, setEditMode] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedSystem, setSelectedSystem] = useState(null);
+  const [systems, setSystems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  useEffect(() => {
+    const fetchSystems = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/Astrology/system", {
+          credentials: "include",
+        });
+        const data = await response.json();
+        setSystems(data);
+      } catch (err) {
+        console.error("Failed to fetch systems:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSystems();
+  }, []);
+
   const [showAddModal, setShowAddModal] = useState(false);
+  const [newSystem, setNewSystem] = useState({
+    name: "",
+    description: "",
+  });
 
-  const [zodiacSigns, setZodiacSigns] = useState([
-    {
-      id: 1,
-      name: "Aries",
-      element: "Fire",
-      planet: "Mars",
-      symbol: "♈",
-      dateRange: "March 21 - April 19",
-      description: "Cardinal fire sign ruled by Mars",
-      traits: ["Courageous", "Energetic", "Dynamic"],
-    },
-    {
-      id: 2,
-      name: "Taurus",
-      element: "Earth",
-      planet: "Venus",
-      symbol: "♉",
-      dateRange: "April 20 - May 20",
-      description: "Fixed earth sign ruled by Venus",
-      traits: ["Patient", "Reliable", "Devoted"],
-    },
-  ]);
-
-  const [planets, setPlanets] = useState([
-    {
-      id: 1,
-      name: "Sun",
-      symbol: "☉",
-      meaning: "Core identity and ego",
-      domicile: "Leo",
-    },
-    {
-      id: 2,
-      name: "Moon",
-      symbol: "☽",
-      meaning: "Emotions and inner self",
-      domicile: "Cancer",
-    },
-  ]);
-
-  const [aspects, setAspects] = useState([
-    {
-      id: 1,
-      name: "Conjunction",
-      angle: "0°",
-      symbol: "☌",
-      nature: "Unifying",
-    },
-    {
-      id: 2,
-      name: "Opposition",
-      angle: "180°",
-      symbol: "☍",
-      nature: "Tensional",
-    },
-  ]);
-
-  const handleEditItem = (item) => {
-    setEditMode(true);
-    setSelectedItem(item);
-  };
-
-  const handleAddNewEntry = () => {
+  const handleShow = () => {
     setShowAddModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowAddModal(false);
+  // Fixed handleAddSystem to actually save to database
+  const handleAddSystem = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/Astrology", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: newSystem.name,
+          description: newSystem.description,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to add system");
+
+      const result = await response.json();
+      
+      // Add the new system to local state with the ID from database
+      setSystems([
+        ...systems,
+        {
+          id: result.id,
+          name: newSystem.name,
+          description: newSystem.description,
+        },
+      ]);
+
+      // Reset form and close modal
+      setNewSystem({
+        name: "",
+        description: "",
+      });
+      setShowAddModal(false);
+    } catch (err) {
+      console.error("Failed to add system:", err);
+      // You might want to show an error message to the user here
+    }
   };
 
-  const handleAddEntry = () => {
-    // Logic to add a new entry would go here
-    setShowAddModal(false);
+  const handleToggleActive = (id, isActive) => {
+    setSystems(
+      systems.map((system) =>
+        system.id === id ? { ...system, active: isActive } : system,
+      ),
+    );
+  };
+
+  const handleEditSystem = (system) => {
+    setSelectedSystem({ ...system });
+    setShowEditModal(true);
+  };
+
+  const handleEditFieldChange = (field, value) => {
+    setSelectedSystem((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleDeleteSystem = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/Astrology/${selectedSystem.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete system");
+
+      setSystems((prev) => prev.filter((s) => s.id !== selectedSystem.id));
+      setShowEditModal(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/Astrology/${selectedSystem.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: selectedSystem.name,
+          description: selectedSystem.description,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update system");
+
+      // Update local state
+      setSystems((prev) =>
+        prev.map((s) => (s.id === selectedSystem.id ? selectedSystem : s))
+      );
+      setShowEditModal(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleNewSystemChange = (field, value) => {
+    setNewSystem({
+      ...newSystem,
+      [field]: value,
+    });
   };
 
   return (
-    <main className="flex flex-col min-h-screen text-gray-200 bg-gray-900">
+    <>
+      <div className="flex flex-col text-gray-200 bg-gray-900">
+        <TabNavigation
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
+        <main className=" flex-1 p-8">
+          {activeSection === "systems" && (
+            <SystemsSection
+              systems={systems}
+              onToggleActive={handleToggleActive}
+              onEditSystem={handleEditSystem}
+              onAddModel={handleShow}
+            />
+          )}
+          {activeSection === "meanings" && <MeaningsSection />}
+        </main>
 
-      <TabNavigation
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
-
-      <section className="overflow-y-auto flex-1 p-8">
-        {activeSection === "zodiac" && (
-          <ZodiacSection
-            zodiacSigns={zodiacSigns}
-            onEditItem={handleEditItem}
+        {showAddModal && (
+          <AddSystemModal
+            newSystem={newSystem}
+            onNewSystemChange={handleNewSystemChange}
+            onAddSystem={handleAddSystem}
+            onCancel={() => setShowAddModal(false)}
           />
         )}
-
-        {activeSection === "planets" && (
-          <PlanetSection planets={planets} onEditItem={handleEditItem} />
+        {showEditModal && (
+          <EditSystemModal
+            selectedSystem={selectedSystem}
+            onFieldChange={handleEditFieldChange}
+            onSaveEdit={handleSaveEdit}
+            onDelete={handleDeleteSystem}
+            onCancel={() => setShowEditModal(false)}
+          />
         )}
-
-        {activeSection === "houses" && <HouseSection />}
-
-        {activeSection === "aspects" && (
-          <AspectSection aspects={aspects} onEditItem={handleEditItem} />
-        )}
-      </section>
-
-      <AddModal
-        isVisible={showAddModal}
-        activeSection={activeSection}
-        onCancel={handleCloseModal}
-        onAdd={handleAddEntry}
-      />
-
+      </div>
       <div>
         <div
           dangerouslySetInnerHTML={{
             __html:
-              '<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">',
+              "<link href=&quot;https://fonts.googleapis.com/css2?family=Inter&display=swap&quot; rel=&quot;stylesheet&quot;>",
           }}
         />
       </div>
-    </main>
+    </>
   );
 }
 

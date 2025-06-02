@@ -1,11 +1,9 @@
 import React from "react";
 
-function TabNavigation({ activeSection, onSectionChange }) {
+function TabNavigation({ activeSection, setActiveSection }) {
   const tabs = [
-    { id: "zodiac", label: "Zodiac Signs" },
-    { id: "planets", label: "Planets" },
-    { id: "houses", label: "Houses" },
-    { id: "aspects", label: "Aspects" },
+    { id: "systems", label: "Systems" },
+    { id: "meanings", label: "Meanings" },
   ];
 
   return (
@@ -14,7 +12,7 @@ function TabNavigation({ activeSection, onSectionChange }) {
         <button
           key={tab.id}
           className="px-5 py-2.5 font-medium rounded-lg"
-          onClick={() => onSectionChange(tab.id)}
+          onClick={() => setActiveSection(tab.id)}
           style={{
             background: activeSection === tab.id ? "#372d45" : "transparent",
           }}

@@ -19,22 +19,24 @@ function AstroAdminDashboard() {
       time: "1h ago",
     },
   ]);
-  const [stats, setStats] = useState({
-    users: 1234,
-    readings: 567,
-    systems: 89,
-  });
+  // Remove hardcoded stats and make it dynamic
+  const [userCount, setUserCount] = useState(0);
 
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user is admin and redirect if needed
     const userRole = localStorage.getItem("userRole");
-    //if (userRole !== "admin") {
-    //  navigate("/");
-    //  return;
-    //}
+    if (userRole !== "admin") {
+      navigate("/");
+      return;
+    }
   }, [navigate]);
+
+  // Function to update user count from ActivityTable
+  const handleUserCountUpdate = (count) => {
+    setUserCount(count);
+  };
 
   return (
     <div className="flex w-screen h-screen bg-gray-900">
@@ -45,12 +47,10 @@ const navigate = useNavigate();
 
         <section className="overflow-y-auto flex-1 p-6 bg-gray-900">
           <div className="grid grid-cols-3 gap-6 mb-6">
-            <StatsCard title="Total Users" value={stats.users} />
-            <StatsCard title="Total Readings" value={stats.readings} />
-            <StatsCard title="Active Systems" value={stats.systems} />
+            <StatsCard title="Total Users" value={userCount} />
           </div>
 
-          <ActivityTable />
+          <ActivityTable onUserCountUpdate={handleUserCountUpdate} />
         </section>
       </main>
 

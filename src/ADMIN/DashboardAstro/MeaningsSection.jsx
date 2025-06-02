@@ -1,13 +1,31 @@
 import React, { useState, useEffect } from "react";
 import EditMeaning from "./EditMeaning";
 
-function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) {
-  const numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22
+function MeaningsSection({ onZodiacClick, zodiacMeanings: propZodiacMeanings }) {
+  const zodiacs = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
 
+  // Zodiac emoji mapping
+  const zodiacEmojis = {
+    "Aries": "♈",
+    "Taurus": "♉",
+    "Gemini": "♊",
+    "Cancer": "♋",
+    "Leo": "♌",
+    "Virgo": "♍",
+    "Libra": "♎",
+    "Scorpio": "♏",
+    "Sagittarius": "♐",
+    "Capricorn": "♑",
+    "Aquarius": "♒",
+    "Pisces": "♓"
+  };
+
   const [showEditMeaning, setShowEditMeaning] = useState(false);
-  const [selectedNumber, setSelectedNumber] = useState(null);
-  const [numberMeanings, setNumberMeanings] = useState(propNumberMeanings || {});
+  const [selectedZodiac, setSelectedZodiac] = useState(null);
+  const [zodiacMeanings, setZodiacMeanings] = useState(propZodiacMeanings || {});
   const [systems, setSystems] = useState([]);
   const [currentMeanings, setCurrentMeanings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +34,7 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
   useEffect(() => {
     const fetchSystems = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/numerology/system", {
+        const response = await fetch("http://localhost:3000/api/astrology/system", {
           credentials: "include",
         });
         const data = await response.json();
@@ -38,10 +56,10 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
     }
   }, [systems]);
 
-  const fetchNumberMeanings = async (number) => {
+  const fetchZodiacMeanings = async (zodiac) => {
     setLoadingMeanings(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/numerology/meanings/${number}`, {
+      const response = await fetch(`http://localhost:3000/api/astrology/meanings/${zodiac}`, {
         credentials: "include",
       });
       
@@ -53,16 +71,16 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
         return Array(systems.length).fill("");
       }
     } catch (err) {
-      console.error("Error fetching number meanings:", err);
+      console.error("Error fetching zodiac meanings:", err);
       return Array(systems.length).fill("");
     } finally {
       setLoadingMeanings(false);
     }
   };
 
-  const saveNumberMeanings = async (number, meanings) => {
+  const saveZodiacMeanings = async (zodiac, meanings) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/numerology/meanings/${number}`, {
+      const response = await fetch(`http://localhost:3000/api/astrology/meanings/${zodiac}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,16 +98,16 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
         return false;
       }
     } catch (err) {
-      console.error("Error saving number meanings:", err);
+      console.error("Error saving zodiac meanings:", err);
       return false;
     }
   };
 
-  const handleNumberClick = async (number) => {
-    setSelectedNumber(number);
+  const handleZodiacClick = async (zodiac) => {
+    setSelectedZodiac(zodiac);
     
     // Fetch meanings from database
-    const meaningsFromDB = await fetchNumberMeanings(number);
+    const meaningsFromDB = await fetchZodiacMeanings(zodiac);
     
     // Ensure we have the right number of meanings (match systems length)
     const meaningsArray = Array(systems.length).fill("").map((_, index) => 
@@ -99,16 +117,16 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
     setCurrentMeanings(meaningsArray);
     
     // Update local state cache
-    setNumberMeanings(prev => ({
+    setZodiacMeanings(prev => ({
       ...prev,
-      [number]: meaningsArray
+      [zodiac]: meaningsArray
     }));
     
     setShowEditMeaning(true);
     
-    // Call parent's onNumberClick if provided
-    if (onNumberClick) {
-      onNumberClick(number);
+    // Call parent's onZodiacClick if provided
+    if (onZodiacClick) {
+      onZodiacClick(zodiac);
     }
   };
 
@@ -120,13 +138,13 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
 
   const handleSave = async () => {
     // Save to database
-    const saveSuccess = await saveNumberMeanings(selectedNumber, currentMeanings);
+    const saveSuccess = await saveZodiacMeanings(selectedZodiac, currentMeanings);
     
     if (saveSuccess) {
       // Update local state only if save was successful
-      setNumberMeanings(prev => ({
+      setZodiacMeanings(prev => ({
         ...prev,
-        [selectedNumber]: [...currentMeanings]
+        [selectedZodiac]: [...currentMeanings]
       }));
       setShowEditMeaning(false);
     } else {
@@ -143,7 +161,7 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
   if (loading) {
     return (
       <section className="p-6 rounded-xl border bg-zinc-800 border-zinc-700">
-        <h2 className="mb-6 text-xl font-semibold text-white">Number Meanings</h2>
+        <h2 className="mb-6 text-xl font-semibold text-white">Zodiac Meanings</h2>
         <p className="text-gray-400">Loading systems...</p>
       </section>
     );
@@ -151,17 +169,18 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
 
   return (
     <section className="p-6 rounded-xl border bg-zinc-800 border-zinc-700">
-      <h2 className="mb-6 text-xl font-semibold text-white">Number Meanings</h2>
+      <h2 className="mb-6 text-xl font-semibold text-white">Zodiac Meanings</h2>
       <div className="grid grid-cols-3 gap-6 max-sm:grid-cols-1">
-        {numbers.map((number) => (
+        {zodiacs.map((zodiac) => (
           <button
-            key={number}
+            key={zodiac}
             className="p-5 cursor-pointer bg-gray-900 rounded-lg border border-zinc-700 hover:bg-gray-800 transition-colors flex flex-col items-center justify-center text-center"
-            onClick={() => handleNumberClick(number)}
+            onClick={() => handleZodiacClick(zodiac)}
             disabled={loadingMeanings}
           >
             <h3 className="mb-3 text-base font-medium text-white flex items-center gap-2">
-              {number}
+              <span className="text-lg">{zodiacEmojis[zodiac]}</span>
+              {zodiac}
             </h3>
             {loadingMeanings && (
               <p className="text-sm text-blue-400">Loading...</p>
@@ -171,7 +190,7 @@ function MeaningsSection({ onNumberClick, numberMeanings: propNumberMeanings }) 
       </div>
       {showEditMeaning && (
         <EditMeaning 
-          selectedNumber={selectedNumber}
+          selectedZodiac={selectedZodiac}
           meanings={currentMeanings}
           systems={systems}
           onMeaningsChange={handleMeaningsChange}

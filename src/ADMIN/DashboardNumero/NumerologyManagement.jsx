@@ -1,61 +1,86 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TabNavigation from "./TabNavigation";
 import SystemsSection from "./SystemsSection";
-import CalculationsSection from "./CalculationsSection";
 import MeaningsSection from "./MeaningsSection";
 import AddSystemModal from "./AddSystemModal";
+import EditSystemModal from "./EditSystemModal";
 
 function NumerologyManagement() {
   const [activeSection, setActiveSection] = useState("systems");
   const [editMode, setEditMode] = useState(false);
   const [selectedSystem, setSelectedSystem] = useState(null);
-  const [systems, setSystems] = useState([
-    {
-      id: 1,
-      name: "Life Path Number",
-      description: "Reveals the path and direction of one's life journey",
-      formula: "Month + Day + Year = Single Digit",
-      active: true,
-    },
-    {
-      id: 2,
-      name: "Expression Number",
-      description: "Shows natural abilities and talents",
-      formula: "Sum of all letters in full name",
-      active: true,
-    },
-    {
-      id: 3,
-      name: "Soul Urge Number",
-      description: "Inner desires and motivations",
-      formula: "Sum of vowels in full name",
-      active: false,
-    },
-  ]);
+  const [systems, setSystems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  useEffect(() => {
+    const fetchSystems = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/numerology/system", {
+          credentials: "include",
+        });
+        const data = await response.json();
+        setSystems(data);
+      } catch (err) {
+        console.error("Failed to fetch systems:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSystems();
+  }, []);
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSystem, setNewSystem] = useState({
     name: "",
     description: "",
-    formula: "",
-    active: true,
   });
 
-  const handleAddSystem = () => {
-    setSystems([
-      ...systems,
-      {
-        ...newSystem,
-        id: systems.length + 1,
-      },
-    ]);
-    setNewSystem({
-      name: "",
-      description: "",
-      formula: "",
-      active: true,
-    });
-    setShowAddModal(false);
+  const handleShow = () => {
+    setShowAddModal(true);
+  };
+
+  // Fixed handleAddSystem to actually save to database
+  const handleAddSystem = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/Numerology", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: newSystem.name,
+          description: newSystem.description,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to add system");
+
+      const result = await response.json();
+      
+      // Add the new system to local state with the ID from database
+      setSystems([
+        ...systems,
+        {
+          id: result.id,
+          name: newSystem.name,
+          description: newSystem.description,
+        },
+      ]);
+
+      // Reset form and close modal
+      setNewSystem({
+        name: "",
+        description: "",
+      });
+      setShowAddModal(false);
+    } catch (err) {
+      console.error("Failed to add system:", err);
+      // You might want to show an error message to the user here
+    }
   };
 
   const handleToggleActive = (id, isActive) => {
@@ -67,8 +92,57 @@ function NumerologyManagement() {
   };
 
   const handleEditSystem = (system) => {
-    setSelectedSystem(system);
-    setEditMode(true);
+    setSelectedSystem({ ...system });
+    setShowEditModal(true);
+  };
+
+  const handleEditFieldChange = (field, value) => {
+    setSelectedSystem((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleDeleteSystem = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/Numerology/${selectedSystem.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete system");
+
+      setSystems((prev) => prev.filter((s) => s.id !== selectedSystem.id));
+      setShowEditModal(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/Numerology/${selectedSystem.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: selectedSystem.name,
+          description: selectedSystem.description,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update system");
+
+      // Update local state
+      setSystems((prev) =>
+        prev.map((s) => (s.id === selectedSystem.id ? selectedSystem : s))
+      );
+      setShowEditModal(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleNewSystemChange = (field, value) => {
@@ -91,9 +165,9 @@ function NumerologyManagement() {
               systems={systems}
               onToggleActive={handleToggleActive}
               onEditSystem={handleEditSystem}
+              onAddModel={handleShow}
             />
           )}
-          {activeSection === "calculations" && <CalculationsSection />}
           {activeSection === "meanings" && <MeaningsSection />}
         </main>
 
@@ -103,6 +177,15 @@ function NumerologyManagement() {
             onNewSystemChange={handleNewSystemChange}
             onAddSystem={handleAddSystem}
             onCancel={() => setShowAddModal(false)}
+          />
+        )}
+        {showEditModal && (
+          <EditSystemModal
+            selectedSystem={selectedSystem}
+            onFieldChange={handleEditFieldChange}
+            onSaveEdit={handleSaveEdit}
+            onDelete={handleDeleteSystem}
+            onCancel={() => setShowEditModal(false)}
           />
         )}
       </div>

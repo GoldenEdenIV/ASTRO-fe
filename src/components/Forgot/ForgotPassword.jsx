@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import PhoneStep from "./PhoneStep";
+import PhoneStep from "./phoneStep";
 import VerificationStep from "./VerificationStep";
 import NewPasswordStep from "./NewPasswordStep";
 import ErrorMessage from "./ErrorMessage";

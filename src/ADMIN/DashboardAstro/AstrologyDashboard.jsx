@@ -24,10 +24,10 @@ const navigate = useNavigate();
   useEffect(() => {
     // Check if user is admin and redirect if needed
     const userRole = localStorage.getItem("userRole");
-    //if (userRole !== "admin") {
-    //  navigate("/");
-    //  return;
-    //}
+    if (userRole !== "admin") {
+     navigate("/");
+      return;
+    }
   }, [navigate]);
 
   return (

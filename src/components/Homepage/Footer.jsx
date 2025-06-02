@@ -27,33 +27,13 @@ const Footer = () => {
   <h2 className="mb-4 text-xl font-medium">Thông tin chung</h2>
   <ul className="text-sm leading-relaxed">
     <li>
-      <a href="/chinh-sach-bao-mat" className="block">
-        Chính sách bảo mật
-      </a>
-    </li>
-    <li>
-      <a href="/dieu-khoan-su-dung" className="block">
-        Điều khoản sử dụng
-      </a>
-    </li>
-    <li>
-      <a href="/contact" className="block">
+      <a href="/contact" className="block text-2xl mb-10">
         Liên hệ
-      </a>
-    </li>
-    <li>
-      <a href="/ve-chung-toi" className="block">
-        Về chúng tôi
       </a>
     </li>
     <li className="mb-2">
       <a href="#" className="block">
         Công cụ được tùy chỉnh theo ngày sinh và tên chính xác của bạn ... Vì vậy, hãy lưu ý: thông tin bạn sắp nhận được có thể khiến bạn bị sốc.
-      </a>
-    </li>
-    <li>
-      <a href="/doi-ngu-admin" className="block">
-        Đội ngũ admin
       </a>
     </li>
   </ul>

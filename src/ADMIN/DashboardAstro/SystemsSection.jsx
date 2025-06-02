@@ -6,7 +6,7 @@ function SystemsSection({ systems, onToggleActive, onEditSystem, onAddModel }) {
     <section className="grid grid-cols-1 gap-6 max-sm:grid-cols-1">
         <button className="p-8 flex-end border-1 border-solid border-white" onClick={() => onAddModel(true)}
         >
-          + Add new number
+          + Add new planet
         </button>
       {systems.map((system) => (
         <SystemCard

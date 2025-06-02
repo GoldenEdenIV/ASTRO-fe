@@ -3,7 +3,6 @@ import React from "react";
 function TabNavigation({ activeSection, setActiveSection }) {
   const tabs = [
     { id: "systems", label: "Systems" },
-    { id: "calculations", label: "Calculations" },
     { id: "meanings", label: "Meanings" },
   ];
 

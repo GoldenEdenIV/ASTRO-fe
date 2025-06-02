@@ -10,7 +10,7 @@ function AddSystemModal({
     <div className="flex fixed inset-0 justify-center items-center bg-black bg-opacity-50 z-50">
       <div className="p-8 rounded-xl bg-zinc-800 max-w-[90%] w-[500px]">
         <h2 className="mb-6 text-xl font-semibold text-white">
-          Add New Numerology System
+          Add New Astrology System
         </h2>
         <form className="flex flex-col gap-4">
           <div>

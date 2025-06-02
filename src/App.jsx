@@ -15,6 +15,7 @@ import AstroAdminDashboard from "./ADMIN/DashboardUser/AstroAdminDashboard.jsx";
 import NumerologyDashboard from "./ADMIN/DashboardNumero/NumerologyDashboard.jsx";
 import AstrologyDashboard from "./ADMIN/DashboardAstro/AstrologyDashboard.jsx";
 import ReadingDashboard from "./ADMIN/DashboardReading/ReadingDashboard.jsx";
+import HuongDan from "./components/Guide/HuongDan.jsx";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/admin-numerology" element={<NumerologyDashboard />} />
         <Route path="/admin-astrology" element={<AstrologyDashboard />} />
         <Route path="/admin-reading" element={<ReadingDashboard />} />
+        <Route path="/guide" element={<HuongDan />} />
       </Routes>
     </div>
   );
