@@ -28,7 +28,7 @@ const Footer = () => {
   <ul className="text-sm leading-relaxed">
     <li>
       <a href="/contact" className="block text-2xl mb-10">
-        Liên hệ
+        XXX
       </a>
     </li>
     <li className="mb-2">

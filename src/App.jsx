@@ -16,6 +16,9 @@ import NumerologyDashboard from "./ADMIN/DashboardNumero/NumerologyDashboard.jsx
 import AstrologyDashboard from "./ADMIN/DashboardAstro/AstrologyDashboard.jsx";
 import ReadingDashboard from "./ADMIN/DashboardReading/ReadingDashboard.jsx";
 import HuongDan from "./components/Guide/HuongDan.jsx";
+import NumerologyResult from "./components/Numerology/NumerologyResult.jsx";
+import AstrologyResult from "./components/Astrology/AstrologyResult.jsx";
+
 
 function App() {
   return (
@@ -34,6 +37,9 @@ function App() {
         <Route path="/admin-astrology" element={<AstrologyDashboard />} />
         <Route path="/admin-reading" element={<ReadingDashboard />} />
         <Route path="/guide" element={<HuongDan />} />
+        <Route path="/numerology/result" element={<NumerologyResult />} />
+        <Route path="/astrology/result" element={<AstrologyResult />} />
+
       </Routes>
     </div>
   );

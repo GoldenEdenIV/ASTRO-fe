@@ -35,7 +35,6 @@ const Homepage = () => {
       <Header />
       <main>
         <Hero />
-        <ArticlesSection />
       </main>
       <Footer />
     </div>

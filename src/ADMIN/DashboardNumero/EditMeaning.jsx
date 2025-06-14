@@ -1,7 +1,7 @@
 import React from "react";
 
 function EditMeaning({ 
-  selectedZodiac, 
+  selectedNumber, 
   meanings, 
   systems, 
   onMeaningsChange, 
@@ -12,7 +12,7 @@ function EditMeaning({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
         <h3 className="text-xl font-semibold text-white mb-6">
-          Edit Meanings for Zodiac {selectedZodiac}
+          Edit Meanings for Number {selectedNumber}
         </h3>
         
         <div className="space-y-4">

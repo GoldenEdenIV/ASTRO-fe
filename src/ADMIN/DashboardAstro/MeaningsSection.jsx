@@ -56,7 +56,7 @@ function MeaningsSection({ onZodiacClick, zodiacMeanings: propZodiacMeanings }) 
     }
   }, [systems]);
 
-  const fetchZodiacMeanings = async (zodiac) => {
+  const fetchZodiacMeanings = async (zodiac, planet) => {
     setLoadingMeanings(true);
     try {
       const response = await fetch(`http://localhost:3000/api/astrology/meanings/${zodiac}`, {

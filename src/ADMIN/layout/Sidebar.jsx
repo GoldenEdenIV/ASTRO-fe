@@ -94,7 +94,7 @@ function Sidebar({ activeTab, setActiveTab }) {
     },
 {
       id: "contact",
-      label: "Contact",
+      label: "(Unused content)",
       path: "/admin-contact",
       icon: (
         <svg
@@ -141,18 +141,25 @@ function Sidebar({ activeTab, setActiveTab }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            className={`flex gap-3 items-center p-3 text-base font-medium rounded-lg hover:bg-zinc-700 transition-colors ${
-              activeTab === item.id ? "bg-purple-900/40" : ""
-            }`}
-            onClick={() => handleNavigation(item)}
-          >
-            {item.icon}
-            <span>{item.label}</span>
-          </button>
-        ))}
+        {navItems.map((item) => {
+          const isDisabled = item.id === '' || item.id === 'contact';
+          
+          return (
+            <button
+              key={item.id}
+              disabled={isDisabled}
+              className={`flex gap-3 items-center p-3 text-base font-medium rounded-lg transition-colors ${
+                isDisabled 
+                  ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" 
+                  : `hover:bg-zinc-700 ${activeTab === item.id ? "bg-purple-900/40" : ""}`
+              }`}
+              onClick={() => !isDisabled && handleNavigation(item)}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
       </div>
     </nav>
   );
